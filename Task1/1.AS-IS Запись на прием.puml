@@ -1,0 +1,22 @@
+@startuml
+title DFD AS-IS: Процесс записи на прием (текущее состояние)
+
+actor "Пациент" as patient
+actor "Ресепшен" as reception
+
+rectangle "1. Запись на приём" as P1 {
+  process P1_proc as "Ручная запись в журнале"
+  rectangle P1_store as "Excel-файлы (общий сетевой диск)"
+}
+
+rectangle "2. Уведомления" as P2 {
+  process P2_proc as "Телефонные звонки"
+}
+
+' Потоки данных
+patient --> reception : Устная информация
+reception --> P1_proc : Запись вручную
+P1_proc --> P1_store : Сохранение в Excel
+P1_store --> P2_proc : Просмотр записей
+P2_proc --> patient : Телефонный звонок
+@enduml

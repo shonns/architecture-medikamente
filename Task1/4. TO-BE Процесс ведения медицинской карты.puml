@@ -1,0 +1,30 @@
+@startuml
+title DFD: Процесс ведения медицинской карты с мерами защиты
+
+actor "Пациент" as patient
+actor "Мед. специалист" as doctor
+
+rectangle "API Шлюз" as gateway
+rectangle "Keycloak (IAM)" as keycloak
+
+rectangle "1. Мед. карта" as P1 {
+  process P1_proc as "Ведение мед. карты"
+  database P1_store as "БД мед. карт\n(шифрование, RBAC)"
+}
+
+rectangle "2. Назначения анализов" as P2 {
+  process P2_proc as "Назначение анализов"
+}
+
+' Потоки данных
+gateway -[#blue]-> keycloak: TLS 1.3
+keycloak -[#blue]-> gateway: TLS 1.3
+patient -[#purple]->gateway
+doctor -[#green]->gateway
+
+gateway -[#purple]-> P1_proc : Предоставление данных через анкету ( TLS 1.3)
+gateway -[#green]-> P1_proc : Ввод данных осмотра ( RBAC/TLS 1.3)
+gateway -[#green]-> P2_proc : Данные для назначений (RBAC)
+P1_proc -[#green]-> P1_store : Обновление карты (RBAC)
+P2_proc -[#green]-> P1_proc : Результаты назначений ( TLS 1.3)
+@enduml

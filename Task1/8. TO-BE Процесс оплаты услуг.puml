@@ -1,0 +1,30 @@
+@startuml
+title DFD: Процесс оплаты услуг
+
+actor "Пациент" as patient
+actor "Платежный шлюз" as payGateway
+rectangle "API Шлюз" as gateway
+rectangle "Keycloak (IAM)" as keycloak
+
+rectangle "1. Оплата услуг" as P1 {
+  process P1_proc as "Обработка платежей"
+  database P1_store as "БД платежей\n(шифрование, RBAC)"
+}
+
+rectangle "2. Интеграция с 1С" as P2 {
+  process P2_proc as "Синхронизация с 1С"
+  database P2_store as "1С:Бухгалтерия предприятия (шифрование)"
+}
+
+' Потоки данных
+
+gateway -[#purple]-> keycloak: TLS 1.3
+keycloak -[#purple]-> gateway: TLS 1.3
+patient -[#purple]->  gateway
+gateway -[#purple]-> P1_proc : Оплата услуг (TLS 1.3)
+P1_proc -[#blue]-> payGateway : Запрос оплаты
+payGateway -[#blue]-> P1_proc : Подтверждение оплаты
+P1_proc -[#purple]-> P1_store : Фиксация операции (TLS 1.3)
+P1_store -[#purple]-> P2_proc : Данные для синхронизации  (TLS 1.3)
+P2_proc -[#purple]-> P2_store : Обновление данных (TLS 1.3)
+@enduml

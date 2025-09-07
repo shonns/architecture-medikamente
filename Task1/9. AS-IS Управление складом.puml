@@ -1,0 +1,16 @@
+@startuml
+title DFD AS-IS: Процесс учета ТМЦ (текущее состояние)
+
+actor "Складской сотрудник" as warehouse
+
+rectangle "1. Учет ТМЦ" as P1 {
+  process P1_proc as "Ручной учет"
+  rectangle P1_store as "1С:Торговля и склад\n(файловый режим)"
+}
+
+
+' Потоки данных
+warehouse --> P1_proc : Данные об остатках
+P1_proc --> P1_store : Ввод в 1С вручную
+
+@enduml

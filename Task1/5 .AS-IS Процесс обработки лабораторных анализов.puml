@@ -1,0 +1,23 @@
+@startuml
+title DFD AS-IS: Процесс обработки лабораторных анализов (текущее состояние)
+
+actor "Лаборатория" as lab
+actor "Мед. специалист" as doctor
+
+rectangle "1. Анализы" as P1 {
+  process P1_proc as "Получение результатов"
+  collections P1_store as "Сканы PDF/JPG (общий сетевой диск)"
+}
+
+rectangle "2. Интеграция с мед. картой" as P2 {
+  process P2_proc as "Прикладывание данных анализов к карте"
+  rectangle P2_store as "Бумажные карты (архив)"
+}
+
+' Потоки данных
+lab --> P1_proc : Бумажные результаты
+P1_proc --> P1_store : Сканирование и сохранение
+P1_store --> P2_proc : Распечатка результатов
+P2_proc --> P2_store : Прикладывание данных к мед. карте
+P2_store --> doctor : Просмотр в архиве
+@enduml

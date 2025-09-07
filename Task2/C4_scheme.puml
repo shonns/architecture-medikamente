@@ -1,0 +1,48 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(admin, "Administrator", "Сотрудник ресепшена")
+Person(patient, "Patient", "Пациент")
+Person(doctor, "Doctor", "Медицинский специалист")
+Person(cassier, "Cassier", "Кассир")
+Person(bookkeeper, "Bookkeeper", "Бухгалтер")
+Person(warehouseKeeper, "Warehouse keeper", "Сотрудник склада")
+
+System_Boundary(medikamente, "МЕДИКАМЕНТЕ") {
+  Container(fileServer, "FileServer", "Windows Server", "Файловый сервер для хранения документов")
+  Container(accounting1C, "1C Бухгалтерия предприятия", "1C", "Бухгалтерская система учёта")
+  Container(warehouse1C, "1C Торговля и склад", "1C", "Складская система учёта")
+  Container(laboratory, "Laboratory", "Лабораторная система", "Медицинская лаборатория")
+  Container(mailServer, "Exchange Mail Server", "Exchange", "Почтовый сервис внутренней почты")
+
+  Container(privGateway, "Privacy API Gateway", "Web API", "Централизованный шлюз для контроля доступа, шифрования, аудита, тегирования и минимизации данных")
+  Container(tagging, "Data Tagging Service", "Service", "Автоматическое присвоение тегов конфиденциальности данным")
+  Container(audit, "Audit Service", "Service", "Ведение журнала доступа, мониторинг действий")
+  Container(consent, "Consent Management Service", "Service", "Управление согласиями клиентов на обработку данных")
+  Container(minimization, "Data Minimization Engine", "Service", "Минимизация выдаваемых данных по принципу need-to-know")
+  Container(analytics, "Secure Analytics Layer", "Service", "Аналитика, BI, ML/AI только на обезличенных/агрегированных данных")
+}
+
+Rel(admin, privGateway, "Запросы/доступ")
+Rel(bookkeeper, privGateway, "Запросы/доступ")
+Rel(cassier, privGateway, "Запросы/доступ")
+Rel(patient, privGateway, "Запросы/доступ")
+Rel(doctor, privGateway, "Запросы/доступ")
+Rel(warehouseKeeper, privGateway, "Запросы/доступ")
+
+Rel(privGateway, fileServer, "Доступ к файлам")
+Rel(privGateway, accounting1C, "Доступ к учёту")
+Rel(privGateway, warehouse1C, "Доступ к складу")
+Rel(privGateway, laboratory, "Доступ к анализам")
+Rel(privGateway, mailServer, "Доступ к почте")
+
+Rel(privGateway, tagging, "Тегирование данных")
+Rel(privGateway, audit, "Аудит и мониторинг")
+Rel(privGateway, consent, "Проверка согласий")
+Rel(privGateway, minimization, "Минимизация данных")
+
+Rel(privGateway, analytics, "Передача обезличенных данных")
+Rel(analytics, tagging, "Получение тегов")
+Rel(analytics, audit, "Аудит аналитики")
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml
+title DFD TO-BE: Процесс учета ТМЦ с мерами защиты
+
+actor "Складской сотрудник" as warehouse
+actor "Бухгалтерия" as accounting
+
+rectangle "API Шлюз" as gateway
+rectangle "Keycloak (IAM)" as keycloak
+
+rectangle "1. Учет ТМЦ" as P1 {
+  process P1_proc as "Система автоматизируемого учета остатков по электронным накладным"
+  database P1_store as "БД ТМЦ\n(шифрование, RBAC)"
+}
+
+rectangle "2. Интеграция с 1С" as P3 {
+  process P3_proc as "Автоматическая синхронизация"
+  database P3_store as "1С:Торговля и склад\n(API интеграция)"
+}
+
+rectangle "3. Отчетность" as P4 {
+  process P4_proc as "Формирование отчетов"
+  database P4_store as "БД отчетов\n(шифрование, RBAC)"
+}
+
+' Потоки данных
+
+gateway -[#purple]-> keycloak: TLS 1.3
+keycloak -[#purple]-> gateway: TLS 1.3
+
+warehouse -[#purple]-> gateway: TLS 1.3
+
+gateway -[#purple]-> P1_proc : Ввод данных (TLS 1.3)
+P1_proc -[#green]-> P1_store : Обновление остатков (RBAC)
+
+
+P1_store -[#green]-> P3_proc : Данные для синхронизации (RBAC)
+P3_proc -[#blue]-> P3_store : Автообмен данными (API)
+
+P1_store -[#green]-> P4_proc : Данные для отчетности (RBAC)
+P4_proc -[#green]-> P4_store : Сохранение отчетов (RBAC)
+accounting -[#green]-> P4_store  : Доступ к отчетам (RBAC)
+
+' Связи между процессами
+P3_store -[#green]-> P1_proc : Данные из 1С (RBAC)
+
+@enduml
