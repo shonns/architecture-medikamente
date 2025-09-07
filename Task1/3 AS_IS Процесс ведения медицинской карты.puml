@@ -1,0 +1,17 @@
+@startuml
+title DFD AS-IS: Процесс ведения медицинской карты (текущее состояние)
+
+actor "Пациент" as patient
+actor "Мед. специалист" as doctor
+
+rectangle "1. Мед. карта" as P1 {
+  process P1_proc as "Заполнение бумажной/excel карты"
+  rectangle P1_store as "Хранилище мед. карт"
+}
+
+
+' Потоки данных
+patient --> doctor : Устная информация
+doctor --> P1_proc : Запись в карту
+P1_proc --> P1_store : Хранение в архиве
+@enduml

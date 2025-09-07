@@ -1,0 +1,23 @@
+@startuml
+title DFD: Процесс обработки лабораторных анализов
+
+actor "Лаборатория" as lab
+actor "Мед. специалист" as doctor
+
+rectangle "1. Анализы" as P1 {
+  process P1_proc as "Обработка анализов"
+  collections P1_store as "Хранилище анализов (шифрование, RBAC)"
+}
+
+rectangle "2. Интеграция с мед. картой" as P2 {
+  process P2_proc as "Привязка данных анализов к мед. карте"
+  database P2_store as "БД мед. карт\n(шифрование)"
+}
+
+' Потоки данных
+lab -[#purple]-> P1_proc : Результаты анализов (mTLS)
+P1_proc -[#purple]-> P1_store : Сохранение результатов (mTLS)
+P1_store -[#purple]-> P2_proc : Данные для интеграции (mTLS)
+P2_proc -[#purple]-> P2_store : Обновление мед. карты (mTLS)
+doctor -[#green]-> P2_store : Доступ к результатам (RBAC)
+@enduml

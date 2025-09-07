@@ -1,0 +1,23 @@
+@startuml
+title DFD AS-IS: Процесс оплаты услуг (текущее состояние)
+
+actor "Пациент" as patient
+actor "Кассир" as cashier
+
+rectangle "1. Оплата услуг" as P1 {
+  process P1_proc as "Приём платежа"
+  rectangle P1_store as "Excel-файлы\n(общий сетевой диск)"
+}
+
+rectangle "2. Ручная 'интеграция' с 1С" as P2 {
+  process P2_proc as "Ручной ввод в 1С"
+  database P2_store as "1С:Бухгалтерия\n(файловый режим)"
+}
+
+' Потоки данных
+patient --> cashier : Оплата услуг
+cashier --> P1_proc : Проведение платежа
+P1_proc --> P1_store : Сохранение в Excel
+P1_store --> P2_proc : Ручной перенос данных
+P2_proc --> P2_store : Ввод в 1С вручную
+@enduml
